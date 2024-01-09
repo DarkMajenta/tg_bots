@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Тарифы и оплата</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="tariffs">
+        <div class="tariff">
+            <h2>Тариф 1</h2>
+            <button class="select-tariff" data-tariff="1">Выбрать</button>
+        </div>
+        <div class="tariff">
+            <h2>Тариф 2</h2>
+            <button class="select-tariff" data-tariff="2">Выбрать</button>
+        </div>
+        <div class="tariff">
+            <h2>Тариф 3</h2>
+            <button class="select-tariff" data-tariff="3">Выбрать</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay">
+        <div class="modal">
+            <h2>Выбор способа оплаты</h2>
+            <!-- Добавьте соответствующие поля и кнопку оплаты здесь -->
+        </div>
+    </div>
+
+    <div class="success-form">
+        <h2>Кастомная веб-форма</h2>
+        <form id="custom-form">
+            <div>
+                <label for="last-name">Фамилия:</label>
+                <input type="text" id="last-name" name="last-name" required>
+            </div>
+            <div>
+                <label for="first-name">Имя:</label>
+                <input type="text" id="first-name" name="first-name" required>
+            </div>
+            <div>
+                <label for="email">Почта:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <input type="checkbox" id="checkbox1" name="checkbox1">
+                <label for="checkbox1">Чекбокс 1</label>
+            </div>
+            <div>
+                <input type="checkbox" id="checkbox2" name="checkbox2">
+                <label for="checkbox2">Чекбокс 2</label>
+            </div>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

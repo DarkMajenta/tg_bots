@@ -78,7 +78,7 @@ def main():
     # Инициализация бота
     #updater = Updater("TOKEN")
     #dispatcher = updater.dispatcher
-    dispatcer = Application.builder().token("TOKEN").build()
+    dispatcher = Application.builder().token("TOKEN").build()
     # Обработчики команд
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(ConversationHandler(

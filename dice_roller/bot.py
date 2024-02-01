@@ -1,6 +1,9 @@
 import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
+
+# Определение состояний для обработчика разговора
+DICE, MODIFIER = range(2)
 
 # Обработчик команды /start
 def start(update: Update, context: CallbackContext):
@@ -35,26 +38,40 @@ def roll(update: Update, context: CallbackContext):
         reply_markup=reply_markup
     )
 
+    return DICE
+
 # Обработчик нажатия кнопки
 def button_click(update: Update, context: CallbackContext):
     query = update.callback_query
     roll_value = int(query.data)
 
-    # Проверяем наличие модификатора в запросе
-    if "+" in query.message.text:
-        dice, modifier = query.message.text.split("+")
-        modifier = int(modifier)
-    else:
-        dice = query.message.text
-        modifier = 0
+    # Сохраняем выбранный кубик в контексте
+    context.user_data['dice'] = query.message.text
+
+    # Запрашиваем модификатор у пользователя
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Введите модификатор:"
+    )
+
+    return MODIFIER
+
+# Обработчик модификатора
+def get_modifier(update: Update, context: CallbackContext):
+    modifier = int(update.message.text.strip())
+
+    # Получаем выбранный кубик из контекста
+    dice = context.user_data.get('dice')
 
     # Кидаем кубик и добавляем модификатор
-    result = random.randint(1, roll_value) + modifier
+    result = random.randint(1, int(dice[1:])) + modifier
 
     context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=f"{dice} 🎲\nРезультат: {result}"
     )
+
+    return ConversationHandler.END
 
 # Тело программы
 def main():
@@ -64,8 +81,14 @@ def main():
 
     # Обработчики команд
     dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("roll", roll))
-    dispatcher.add_handler(CallbackQueryHandler(button_click))
+    dispatcher.add_handler(ConversationHandler(
+        entry_points=[CommandHandler("roll", roll)],
+        states={
+            DICE: [CallbackQueryHandler(button_click)],
+            MODIFIER: [MessageHandler(None, get_modifier)]
+        },
+        fallbacks=[]
+    ))
 
     # Запуск бота
     updater.start_polling()

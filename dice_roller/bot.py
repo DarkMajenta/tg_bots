@@ -76,12 +76,12 @@ def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Тело программы
 def main():
     # Инициализация бота
-    #updater = Updater("TOKEN")
-    #dispatcher = updater.dispatcher
-    dispatcher = Application.builder().token("TOKEN").build()
+    #application = Updater("TOKEN")
+    #application = application.application
+    application = Application.builder().token("TOKEN").build()
     # Обработчики команд
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(ConversationHandler(
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(ConversationHandler(
         entry_points=[CommandHandler("roll", roll)],
         states={
             DICE: [CallbackQueryHandler(button_click)],
@@ -91,8 +91,8 @@ def main():
     ))
 
     # Запуск бота
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
+    application.idle()
 
 if __name__ == '__main__':
     main()

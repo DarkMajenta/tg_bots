@@ -1,33 +1,75 @@
 import random
-import telebot
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler
 
-TOKEN = 'TOKEN'
+# Обработчик команды /start
+def start(update: Update, context: CallbackContext):
+    user = update.effective_user
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f"Привет, {user.first_name}! Я бот для кубиков DnD. Что будем кидать? 🎲"
+        )
 
-bot = telebot.TeleBot(TOKEN)
+# Обработчик команды /roll
+def roll(update: Update, context: CallbackContext):
+    # Создаем кнопки для выбора кубика
+    keyboard = [
+        [InlineKeyboardButton("d2", callback_data='2'),
+         InlineKeyboardButton("d3", callback_data='3'),
+         InlineKeyboardButton("d4", callback_data='4')],
+        [InlineKeyboardButton("d6", callback_data='6'),
+         InlineKeyboardButton("d8", callback_data='8'),
+         InlineKeyboardButton("d10", callback_data='10')],
+        [InlineKeyboardButton("d12", callback_data='12'),
+         InlineKeyboardButton("d16", callback_data='16'),
+         InlineKeyboardButton("d20", callback_data='20'),
+         InlineKeyboardButton("d100", callback_data='100')]
+    ]
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    markup = telebot.types.ReplyKeyboardMarkup(row_width=4)
-    markup.add(
-        telebot.types.KeyboardButton('d2'),
-        telebot.types.KeyboardButton('d3'),
-        telebot.types.KeyboardButton('d4'),
-        telebot.types.KeyboardButton('d6'),
-        telebot.types.KeyboardButton('d8'),
-        telebot.types.KeyboardButton('d10'),
-        telebot.types.KeyboardButton('d12'),
-        telebot.types.KeyboardButton('d16'),
-        telebot.types.KeyboardButton('d20'),
-        telebot.types.KeyboardButton('d100')
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    # Отправляем сообщение с кнопками
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Выбери кубик:",
+        reply_markup=reply_markup
     )
-    bot.send_message(message.chat.id, 'Выберите кубик:', reply_markup=markup)
 
-@bot.message_handler(func=lambda message: message.text in ['d2', 'd3', 'd4', 'd6', 'd8', 'd10', 'd12', 'd16', 'd20', 'd100'])
-def roll_dice(message):
-    dice = message.text
-    modifier = message.text.split('+')[-1] if '+' in message.text else 0
-    result = random.randint(1, int(dice[1:]))
-    response = f'Выпало {result} на {dice}{"+" + str(modifier) if modifier else ""}'
-    bot.send_message(message.chat.id, response)
+# Обработчик нажатия кнопки
+def button_click(update: Update, context: CallbackContext):
+    query = update.callback_query
+    roll_value = int(query.data)
 
-bot.polling()
+    # Проверяем наличие модификатора в запросе
+    if "+" in query.message.text:
+        dice, modifier = query.message.text.split("+")
+        modifier = int(modifier)
+    else:
+        dice = query.message.text
+        modifier = 0
+
+    # Кидаем кубик и добавляем модификатор
+    result = random.randint(1, roll_value) + modifier
+
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"{dice} 🎲\nРезультат: {result}"
+    )
+
+# Тело программы
+def main():
+    # Инициализация бота
+    updater = Updater("TOKEN", use_context=True)
+    dispatcher = updater.dispatcher
+
+    # Обработчики команд
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("roll", roll))
+    dispatcher.add_handler(CallbackQueryHandler(button_click))
+
+    # Запуск бота
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()

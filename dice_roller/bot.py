@@ -1,12 +1,12 @@
 import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
 
 # Определение состояний для обработчика разговора
 DICE, MODIFIER = range(2)
 
 # Обработчик команды /start
-def start(update: Update, context: CallbackContext):
+def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -14,7 +14,7 @@ def start(update: Update, context: CallbackContext):
         )
 
 # Обработчик команды /roll
-def roll(update: Update, context: CallbackContext):
+def roll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Создаем кнопки для выбора кубика
     keyboard = [
         [InlineKeyboardButton("d2", callback_data='2'),
@@ -41,7 +41,7 @@ def roll(update: Update, context: CallbackContext):
     return DICE
 
 # Обработчик нажатия кнопки
-def button_click(update: Update, context: CallbackContext):
+def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     roll_value = int(query.data)
 
@@ -57,7 +57,7 @@ def button_click(update: Update, context: CallbackContext):
     return MODIFIER
 
 # Обработчик модификатора
-def get_modifier(update: Update, context: CallbackContext):
+def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE):
     modifier = int(update.message.text.strip())
 
     # Получаем выбранный кубик из контекста
@@ -76,9 +76,9 @@ def get_modifier(update: Update, context: CallbackContext):
 # Тело программы
 def main():
     # Инициализация бота
-    updater = Updater("TOKEN", use_context=True)
-    dispatcher = updater.dispatcher
-
+    #updater = Updater("TOKEN")
+    #dispatcher = updater.dispatcher
+    dispatcer = Application.builder().token("TOKEN").build()
     # Обработчики команд
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(ConversationHandler(

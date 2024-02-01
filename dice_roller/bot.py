@@ -1,7 +1,7 @@
 import random
 import telebot
 
-TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+TOKEN = 'TOKEN'
 
 bot = telebot.TeleBot(TOKEN)
 

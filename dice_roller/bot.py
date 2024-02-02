@@ -6,18 +6,15 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 DICE, MODIFIER = range(2)
 
 # Обработчик команды /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
-    #context.bot.send_message(
-    await update.message.reply_html(
-        #chat_id=update.message.chat_id,
-        #text=
-        rf"Привет, {user.first_name}! Я бот для кубиков DnD. Что будем кидать? 🎲",
-        reply_markup=ForceReply(selective=True),
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f"Привет, {user.first_name}! Я бот для кубиков DnD. Что будем кидать? 🎲"
         )
 
 # Обработчик команды /roll
-async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Создаем кнопки для выбора кубика
     keyboard = [
         [InlineKeyboardButton("d2", callback_data='2'),
@@ -44,7 +41,7 @@ async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     return DICE
 
 # Обработчик нажатия кнопки
-async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
+def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
     query = update.callback_query
     roll_value = int(query.data)
 
@@ -60,7 +57,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> N
     return MODIFIER
 
 # Обработчик модификатора
-async def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
+def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
     modifier = int(update.message.text.strip())
 
     # Получаем выбранный кубик из контекста
@@ -77,7 +74,7 @@ async def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> N
     return ConversationHandler.END
 
 # Тело программы
-async def main() -> None:
+def main() -> None:
     # Инициализация бота
     #application = Updater("TOKEN")
     #application = application.application

@@ -6,15 +6,18 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 DICE, MODIFIER = range(2)
 
 # Обработчик команды /start
-def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
-    context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text=f"Привет, {user.first_name}! Я бот для кубиков DnD. Что будем кидать? 🎲"
+    #context.bot.send_message(
+    await update.message.reply_html(
+        #chat_id=update.message.chat_id,
+        #text=
+        rf"Привет, {user.first_name}! Я бот для кубиков DnD. Что будем кидать? 🎲",
+        reply_markup=ForceReply(selective=True),
         )
 
 # Обработчик команды /roll
-def roll(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Создаем кнопки для выбора кубика
     keyboard = [
         [InlineKeyboardButton("d2", callback_data='2'),
@@ -41,7 +44,7 @@ def roll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return DICE
 
 # Обработчик нажатия кнопки
-def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
     query = update.callback_query
     roll_value = int(query.data)
 
@@ -57,7 +60,7 @@ def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return MODIFIER
 
 # Обработчик модификатора
-def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE)  -> None:
     modifier = int(update.message.text.strip())
 
     # Получаем выбранный кубик из контекста
@@ -74,7 +77,7 @@ def get_modifier(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 # Тело программы
-def main():
+async def main() -> None:
     # Инициализация бота
     #application = Updater("TOKEN")
     #application = application.application
@@ -91,7 +94,7 @@ def main():
     ))
 
     # Запуск бота
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
     application.idle()
 
 if __name__ == '__main__':

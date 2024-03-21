@@ -1,4 +1,4 @@
-  GNU nano 7.2                                 telebot_monitor/main_2.py                                            
+                               
 import telebot
 import requests
 import threading
